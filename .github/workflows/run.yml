@@ -1,0 +1,31 @@
+name: 🚀 Run
+
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */3 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setting up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: 🌐 Install Google Chrome 
+        run: |
+          chmod +x ./InstallChrome.sh
+          ./InstallChrome.sh
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Running the Python script
+        env:
+          SUNNYPORTAL_EMAIL: ${{ secrets.SUNNYPORTAL_EMAIL }}
+          SUNNYPORTAL_PASSWORD: ${{ secrets.SUNNYPORTAL_PASSWORD }}
+        run: python sunnyportal.py "$SUNNYPORTAL_EMAIL" "$SUNNYPORTAL_PASSWORD"
+      - name: Upload
+        env:
+            API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
+        run: bash upload.sh "$API_HOSTNAME"
